@@ -195,6 +195,41 @@ class EnigmaService {
         }
     }
 
+    async getFilterPanes() {
+        const objectsInfo = await this.app.getObjects({qTypes: ['listbox']})
+        const objects = await Promise.all(objectsInfo.map(obj => this.app.getObject(obj.qInfo.qId)))
+
+        const objProperties = await Promise.all(objects.map(obj => obj.getProperties()))
+
+        const filterMask = objProperties.map(helperFunctions.filterListBoxes)
+
+        const filteredObjects = objects.filter((obj, idx) => filterMask[idx])
+        const filteredProps = objProperties.filter((obj, idx) => filterMask[idx])
+
+        const affectedFilterPanes = await Promise.all(filteredObjects.map(obj => obj.getParent()))
+
+        
+        const sheets = await Promise.all(affectedFilterPanes.map(async filterPane => {
+            if (filterPane.genericType === 'masterobject') return ''
+            return (await filterPane.getParent()).getProperties()
+        }))
+        
+        console.log('props', filteredProps)
+        console.log('sheets', sheets)
+        const filterPaneInfo = filteredObjects.map((obj, idx) => {
+            // const filterPane = affectedFilterPanes[idx]
+            const props = filteredProps[idx]
+            const dimDef = filteredProps[idx].qListObjectDef.qDef.qFieldDefs.join(' | ')
+            const sheet = sheets[idx]
+            return {
+                filterPane: props,
+                affectedDim: dimDef,
+                sheet: sheet
+            }
+        })
+
+        return filterPaneInfo
+    }
     async getScript() {
         try {
             return await this.app.getScript()

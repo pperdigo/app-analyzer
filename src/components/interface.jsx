@@ -15,6 +15,7 @@ const Interface = () => {
             measures,
             bookmarks,
             variables,
+            filterPanes
         ] = await Promise.all([
             selApp.getMasterObjects(),
             selApp.getCharts(),
@@ -23,6 +24,7 @@ const Interface = () => {
             selApp.getMeasures(),
             selApp.getBookmarks(),
             selApp.getVariables(),
+            selApp.getFilterPanes()
         ]) 
 
         console.log('items de interesse: ', {
@@ -32,7 +34,8 @@ const Interface = () => {
             dimensions,
             measures,
             bookmarks,
-            variables
+            variables,
+            filterPanes
         })
 
         downloadBookmarks(bookmarks)
@@ -42,10 +45,30 @@ const Interface = () => {
         downloadDimensions(dimensions)
         downloadMeasures(measures)
         downloadVariables(variables)
+        downloadFilterPane(filterPanes)
     }
 
     const removeCRLF = (string) => {
         return string?.replaceAll('\r', '')?.replaceAll('\n', '')?.replaceAll('\t', '')
+    }
+
+    const downloadFilterPane = (filterPanes) => {
+        const filterPaneCSV = filterPanes.map((filterPane, idx) => {
+            console.log('filterPane', idx, filterPane)
+            return {
+                "Id": filterPane.filterPane.qInfo.qId,
+                "Nome": filterPane.filterPane.title,
+                "Filtro afetado": filterPane.affectedDim,
+                "Pasta (Id)": filterPane.sheet?.qInfo?.qId,
+                "Pasta (Nome)": filterPane.sheet?.qMetaDef?.title
+            }
+        })
+
+        jsonToCsvExport({
+            data: filterPaneCSV,
+            filename: `${selApp.appName}_filterpanes.csv`,
+            delimiter: '|'
+        })
     }
 
     const downloadBookmarks = (bookmarks) => {
@@ -76,7 +99,6 @@ const Interface = () => {
                 let currMeasureDef
                 if (i < affectedDims) currDimDef = item.affectedDims[i].qDef.qFieldDefs.join(' | ') 
                 if (i < affectedMeasures) currMeasureDef = item.affectedMeasures[i].qDef.qDef
-                console.log(item)
                 lines.push({
                     Id: item.properties.qInfo.qId,
                     Nome: item.properties.title,
@@ -91,7 +113,6 @@ const Interface = () => {
             return lines
         })
 
-        console.log(chartsCSV.flat())
         jsonToCsvExport({
             data: chartsCSV.flat(),
             filename: `${selApp.appName}_charts.csv`,

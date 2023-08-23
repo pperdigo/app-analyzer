@@ -67,9 +67,19 @@ const helperFunctions = {
         return valuesToSearch.find(value => definition.includes(value))
     },
 
+    filterListBoxes(listbox) {
+        const def = listbox.qListObjectDef.qDef.qFieldDefs.join(' | ').toUpperCase()
+
+        return valuesToSearch.some((value) => def.includes(value))
+    },
+
     findAffectedDims(dim) {
         const dimDef = dim.qDef.qFieldDefs.join(' | ').toUpperCase()
 
+        return valuesToSearch.some(value => dimDef.includes(value))
+    },
+
+    findAffectedListBoxes(dimDef) {
         return valuesToSearch.some(value => dimDef.includes(value))
     },
 
