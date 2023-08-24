@@ -6,5 +6,16 @@
     "qlik-multi-kpi",
     "waterfallchart",
     "barchart",
-    "piechart"
+    "piechart",
+    "scatterplot",
+    "histogram",
+    "combochart",
+    "linechart",
+    "mekkochart",
+    "treemap",
+    "gauge",
+    "boxplot",
+    "distributionplot",
+    "bulletchart",
+    "text-image"
 ]

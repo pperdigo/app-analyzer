@@ -1,0 +1,12 @@
+{
+    "type": "mashup",
+    "name": "App analyzer",
+    "description": "App para analizar impacto da adição das linhas CGL3 e RCL2 ao Qlik",
+    "version": "1.0.0",
+    "author": "Pedro Perdigão",
+    "keywords": "qlik-sense, visualization, mashup",
+    "preview": "img/preview.png",
+    "dependencies": {
+        "qlik-sense": ">=3.0.x"
+	 }
+}

@@ -26,7 +26,7 @@ class EnigmaService {
         const session = enigma.create({
             schema,
             // url: `ws://${import.meta.env.QLIK_VITE_HOSTNAME}:${import.meta.env.QLIK_VITE_PORT}/app/engineData`,
-            url: `ws://localhost:4848/app/${this.appId}`,
+            url: `ws://10.158.116.61/app/${this.appId}`,
             createSocket: url => new WebSocket(url)
         })
         session.on('opened', () => console.log('Conexão aberta', this.appName))
