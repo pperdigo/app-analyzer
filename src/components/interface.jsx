@@ -61,8 +61,9 @@ const Interface = () => {
                 "Id": filterPane.filterPane.qInfo.qId,
                 "Nome": filterPane.filterPane.title,
                 "Filtro afetado": filterPane.affectedDim,
-                "Pasta (Id)": filterPane.sheet?.qInfo?.qId,
-                "Pasta (Nome)": filterPane.sheet?.qMetaDef?.title
+                "Pasta (Id)": filterPane.sheetProps?.qInfo?.qId,
+                "Pasta (Nome)": filterPane.sheetProps?.qMetaDef?.title,
+                "Pasta Publicada?": filterPane.sheetLayout.qMeta?.published
             }
         })
 
@@ -112,8 +113,9 @@ const Interface = () => {
                     "Tipo de Visualização": item.properties.visualization,
                     "Dimensão Impactada": removeCRLF(currDimDef),
                     "Medida Impactada": removeCRLF(currMeasureDef),
-                    "Pasta (ID)": item.linkedSheet.qInfo.qId,
-                    "Pasta (Nome)":item.linkedSheet.qMetaDef.title,
+                    "Pasta (ID)": item.linkedSheetProps.qInfo.qId,
+                    "Pasta (Nome)":item.linkedSheetProps.qMetaDef.title,
+                    "Pasta Publicada?":item.linkedSheetLayout.qMeta?.published
                 })
                 
             }

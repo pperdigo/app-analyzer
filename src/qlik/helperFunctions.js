@@ -22,10 +22,12 @@ const helperFunctions = {
 
             const measureCheck = measureDefs.some(measure => valuesToSearch.find(value => {
                 if (!measure) return false
-                return measure.toUpperCase().includes(value)
+                return measure.includes(value)
             }))
 
-            if(measureCheck) return true
+            if(measureCheck) {
+                return true
+            }
         }
 
         //se dimensions não for array vazia
@@ -33,17 +35,19 @@ const helperFunctions = {
             const dimensionDefs = dimensions.map(dim => dim.qDef.qFieldDefs)
             const dimCheck = dimensionDefs.some(dim => valuesToSearch.find(value => {
                 if (!dim) return false
-                return dim.join('|').toUpperCase().includes(value)
+                return dim.join('|').includes(value)
             }))
 
-            if(dimCheck) return true
+            if(dimCheck) {
+                return true
+            }
         }
 
         return false
     },
 
     filterSheets(sheet){
-        const sheetLabel = sheet.props?.labelExpression?.qStringExpression?.qExpr.toUpperCase()
+        const sheetLabel = sheet.props?.labelExpression?.qStringExpression?.qExpr
         if(!sheetLabel) return false
         return valuesToSearch.find(value => sheetLabel.includes(value))
     },
@@ -51,17 +55,17 @@ const helperFunctions = {
     filterDimensions(dimension) {
         const definitions = dimension.qDim.qFieldDefs
 
-        return definitions.some(dim => valuesToSearch.find(value => dim.toUpperCase().includes(value)))
+        return definitions.some(dim => valuesToSearch.find(value => dim.includes(value)))
     },
 
     filterMeasures(measure) {
-        const definition = measure.qMeasure.qDef.toUpperCase()
+        const definition = measure.qMeasure.qDef
 
         return valuesToSearch.find(value => definition.includes(value))
     },
 
     filterBookmarks(element) {
-        return valuesToSearch.some(value => element.toUpperCase().includes(value))
+        return valuesToSearch.some(value => element.includes(value))
     },
 
     filterVariable(variable) {        
@@ -69,18 +73,18 @@ const helperFunctions = {
             return false
         }
 
-        const definition = variable.qDefinition.toUpperCase()
+        const definition = variable.qDefinition
         return valuesToSearch.find(value => definition.includes(value))
     },
 
     filterListBoxes(listbox) {
-        const def = listbox.qListObjectDef.qDef.qFieldDefs.join(' | ').toUpperCase()
+        const def = listbox.qListObjectDef.qDef.qFieldDefs.join(' | ')
 
         return valuesToSearch.some((value) => def.includes(value))
     },
 
     findAffectedDims(dim) {
-        const dimDef = dim.qDef.qFieldDefs.join(' | ').toUpperCase()
+        const dimDef = dim.qDef.qFieldDefs.join(' | ')
 
         return valuesToSearch.some(value => dimDef.includes(value))
     },
@@ -90,7 +94,7 @@ const helperFunctions = {
     },
 
     findAffectedMeasures(measure) { 
-        const measureDef = measure?.qDef?.qDef?.toUpperCase()
+        const measureDef = measure?.qDef?.qDef
 
         return valuesToSearch.some(value => measureDef?.includes(value))
     }
