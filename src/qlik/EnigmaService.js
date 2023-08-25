@@ -95,7 +95,9 @@ class EnigmaService {
 
             const chartInfo = await Promise.all(filteredObjs.map( async (obj, idx) => {
                 const properties = filterdProps[idx]
-                const linkedSheet = await (await obj.getParent()).getProperties();
+                const linkedSheet = await obj.getParent();
+                const linkedSheetProps = await linkedSheet.getLayout();
+                const linkedSheetLayout = await linkedSheet.getProperties();
 
                 let affectedDims, affectedMeasures
 
@@ -111,7 +113,8 @@ class EnigmaService {
                     properties,
                     affectedDims,
                     affectedMeasures,
-                    linkedSheet
+                    linkedSheetProps,
+                    linkedSheetLayout
                 }
             }))
             return chartInfo
@@ -220,20 +223,24 @@ class EnigmaService {
         const affectedFilterPanes = await Promise.all(filteredObjects.map(obj => obj.getParent()))
 
         
-        const sheets = await Promise.all(affectedFilterPanes.map(async filterPane => {
+        const sheetInfos = await Promise.all(affectedFilterPanes.map(async filterPane => {
             if (filterPane.genericType === 'masterobject') return ''
-            return (await filterPane.getParent()).getProperties()
+            const parentSheet = await filterPane.getParent()
+            return {
+                sheetProps: parentSheet.getProperties(),
+                sheetLayout: parentSheet.getLayout()
+            }
         }))
         
         const filterPaneInfo = filteredObjects.map((obj, idx) => {
             // const filterPane = affectedFilterPanes[idx]
             const props = filteredProps[idx]
             const dimDef = filteredProps[idx].qListObjectDef.qDef.qFieldDefs.join(' | ')
-            const sheet = sheets[idx]
+            const sheetInfo = sheetInfos[idx]
             return {
                 filterPane: props,
                 affectedDim: dimDef,
-                sheet: sheet
+                ...sheetInfo
             }
         })
 
