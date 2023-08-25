@@ -6,15 +6,24 @@ const helperFunctions = {
             return false
         }
 
-        const measures = chart.qHyperCubeDef.qMeasures.filter(dim => !dim.qLibraryId)
-        const dimensions = chart.qHyperCubeDef.qDimensions.filter(dim => !dim.qLibraryId)
+        let measures, dimensions
 
+        if(chart.visualization === 'boxplot') {
+            measures = chart.boxplotDef.qHyperCubeDef.qMeasures.filter(measure => !measure.qLibraryId)
+            dimensions = chart.boxplotDef.qHyperCubeDef.qDimensions.filter(dim => !dim.qLibraryId)
+        } else {
+            measures = chart.qHyperCubeDef.qMeasures.filter(measure => !measure.qLibraryId)
+            dimensions = chart.qHyperCubeDef.qDimensions.filter(dim => !dim.qLibraryId)
+        }
 
         //se measures não for array vazia
         if(measures) {
             const measureDefs = measures.map(measure => measure.qDef.qDef)
-            
-            const measureCheck = measureDefs.some(measure => valuesToSearch.find(value => measure.toUpperCase().includes(value)))
+
+            const measureCheck = measureDefs.some(measure => valuesToSearch.find(value => {
+                if (!measure) return false
+                return measure.toUpperCase().includes(value)
+            }))
 
             if(measureCheck) return true
         }
@@ -22,10 +31,15 @@ const helperFunctions = {
         //se dimensions não for array vazia
         if(dimensions) {
             const dimensionDefs = dimensions.map(dim => dim.qDef.qFieldDefs)
-            const dimCheck = dimensionDefs.some(dim => valuesToSearch.find(value => dim.join('|').toUpperCase().includes(value)))
+            const dimCheck = dimensionDefs.some(dim => valuesToSearch.find(value => {
+                if (!dim) return false
+                return dim.join('|').toUpperCase().includes(value)
+            }))
 
             if(dimCheck) return true
         }
+
+        return false
     },
 
     filterSheets(sheet){
@@ -45,14 +59,6 @@ const helperFunctions = {
 
         return valuesToSearch.find(value => definition.includes(value))
     },
-
-    // filterBookmarks(fieldsOfInterest) {
-    //     return (element) => {
-    //         console.log(fieldsOfInterest, element)
-
-    //         return fieldsOfInterest.some((fieldName => element.selectionFields.includes(fieldName)))
-    //     }
-    // },
 
     filterBookmarks(element) {
         return valuesToSearch.some(value => element.toUpperCase().includes(value))

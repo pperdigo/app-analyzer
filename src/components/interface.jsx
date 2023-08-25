@@ -7,6 +7,7 @@ const Interface = () => {
     const [selApp, setSelApp] = useState()
 
     const generateReport = async () => {
+        console.log('start analysis for', selApp.appName)
         const [
             masterItems,
             charts,
@@ -15,7 +16,7 @@ const Interface = () => {
             measures,
             bookmarks,
             variables,
-            filterPanes
+            filterPanes,
         ] = await Promise.all([
             selApp.getMasterObjects(),
             selApp.getCharts(),
@@ -24,10 +25,10 @@ const Interface = () => {
             selApp.getMeasures(),
             selApp.getBookmarks(),
             selApp.getVariables(),
-            selApp.getFilterPanes()
+            selApp.getFilterPanes(),
         ]) 
 
-        console.log('items de interesse: ', {
+        console.log('result:', {
             masterItems,
             charts,
             sheets,
@@ -35,7 +36,7 @@ const Interface = () => {
             measures,
             bookmarks,
             variables,
-            filterPanes
+            filterPanes,
         })
 
         downloadBookmarks(bookmarks)
@@ -46,6 +47,8 @@ const Interface = () => {
         downloadMeasures(measures)
         downloadVariables(variables)
         downloadFilterPane(filterPanes)
+
+        console.log('end analysis for ', selApp.appName)
     }
 
     const removeCRLF = (string) => {
@@ -53,8 +56,7 @@ const Interface = () => {
     }
 
     const downloadFilterPane = (filterPanes) => {
-        const filterPaneCSV = filterPanes.map((filterPane, idx) => {
-            console.log('filterPane', idx, filterPane)
+        const filterPaneCSV = filterPanes.map((filterPane) => {
             return {
                 "Id": filterPane.filterPane.qInfo.qId,
                 "Nome": filterPane.filterPane.title,
@@ -67,6 +69,7 @@ const Interface = () => {
         jsonToCsvExport({
             data: filterPaneCSV,
             filename: `${selApp.appName}_filterpanes.csv`,
+            headers: ['Id do Painel de Filtro', 'Nome do Painel de Filtro', 'Filtro afetado do Painel de Filtro', 'Pasta (Id) do Painel de Filtro', 'Pasta (Nome) do Painel de Filtro'],
             delimiter: '|'
         })
     }
@@ -83,14 +86,16 @@ const Interface = () => {
         jsonToCsvExport({
             data: bookmarksCSV,
             filename: `${selApp.appName}_bookmarks.csv`,
+            headers: ['Id do Bookmark', 'Nome do Bookmark', 'Set Analysis do Bookmark'],
             delimiter: '|'
         })
     }
 
     const downloadCharts = (charts) => {
         const chartsCSV = charts.map(item => {
-            const affectedDims = item.affectedDims.length
-            const affectedMeasures = item.affectedMeasures.length
+            console.log(item)
+            const affectedDims = item.affectedDims?.length || 0
+            const affectedMeasures = item.affectedMeasures?.length || 0
             const maxExpressions = Math.max(affectedDims, affectedMeasures)
 
             const lines = []
@@ -99,9 +104,11 @@ const Interface = () => {
                 let currMeasureDef
                 if (i < affectedDims) currDimDef = item.affectedDims[i].qDef.qFieldDefs.join(' | ') 
                 if (i < affectedMeasures) currMeasureDef = item.affectedMeasures[i].qDef.qDef
+
+                const title = item.properties.title.qStringExpression ? item.properties.title.qStringExpression.qExpr : item.properties.title
                 lines.push({
                     Id: item.properties.qInfo.qId,
-                    Nome: item.properties.title,
+                    Nome: title,
                     "Tipo de Visualização": item.properties.visualization,
                     "Dimensão Impactada": removeCRLF(currDimDef),
                     "Medida Impactada": removeCRLF(currMeasureDef),
@@ -116,6 +123,7 @@ const Interface = () => {
         jsonToCsvExport({
             data: chartsCSV.flat(),
             filename: `${selApp.appName}_charts.csv`,
+            headers: ['Id da Visualização', 'Nome da Visualização', "Tipo de Visualização da Visualização", "Dimensão Impactada da Visualização", "Medida Impactada da Visualização", "Pasta (ID) da Visualização", "Pasta (Nome) da Visualização"],
             delimiter: '|'
         })
     }
@@ -133,6 +141,7 @@ const Interface = () => {
         jsonToCsvExport({
             data: sheetsCSV,
             filename: `${selApp.appName}_sheets.csv`,
+            headers: ['Id da Pasta', 'Nome da Pasta', 'Expressão de Título da Pasta', 'Publicada?'],
             delimiter: '|'
         })
     }
@@ -164,6 +173,7 @@ const Interface = () => {
         jsonToCsvExport({
             data: masterItemCSV.flat(),
             filename: `${selApp.appName}_masterItems.csv`,
+            headers: ['Id do Item Mestre', 'Nome do Item Mestre', "Tipo de Visualização do Item Mestre", "Dimensão Impactada do Item Mestre", "Medida Impactada do Item Mestre"],
             delimiter: '|'
         })
     }
@@ -180,6 +190,7 @@ const Interface = () => {
         jsonToCsvExport({
             data: dimensionsCSV,
             filename: `${selApp.appName}_dimensions.csv`,
+            headers: ['Id da Dimensão', 'Nome da Dimensão', 'Expressão da Dimensão'],
             delimiter: '|'
         })
     }
@@ -196,6 +207,7 @@ const Interface = () => {
         jsonToCsvExport({
             data: measuresCSV,
             filename: `${selApp.appName}_measures.csv`,
+            headers: ['Id da Medida', 'Nome da Medida', 'Expressão da Medida'],
             delimiter: '|'
         })
     }
@@ -212,6 +224,7 @@ const Interface = () => {
         jsonToCsvExport({
             data: variablesCSV,
             filename: `${selApp.appName}_variables.csv`,
+            headers: ['Id da Variável', 'Nome da Variável', 'Expressão da Variável'],
             delimiter: '|'
         })
     }

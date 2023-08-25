@@ -29,8 +29,8 @@ class EnigmaService {
             url: `ws://10.158.116.61/app/${this.appId}`,
             createSocket: url => new WebSocket(url)
         })
-        session.on('opened', () => console.log('Conexão aberta', this.appName))
-        session.on('closed', () => console.log('Conexão fechada', this.appName))
+        // session.on('opened', () => console.log('Conexão aberta', this.appName))
+        // session.on('closed', () => console.log('Conexão fechada', this.appName))
         session.on('notification:*', (eventName, data) => console.log(eventName, data, this.appName));
 
         const global = await session.open()
@@ -50,10 +50,10 @@ class EnigmaService {
     async getAllInfos() {
         try {
             const allInfos = await this.app.getAllInfos()
-            const selection = allInfos.filter(info => ['measure', 'dimension', 'bookmark'].includes(info.qType))
-            console.log('allInfos', selection)
+            console.log('allInfos', allInfos)
+            console.log("types", Array.from(new Set(allInfos.map(obj => obj.qType))))
         } catch (error) {
-            console.log('error getting all infos', error)
+            console.error('error getting all infos', error)
         }
     }
 
@@ -96,10 +96,21 @@ class EnigmaService {
             const chartInfo = await Promise.all(filteredObjs.map( async (obj, idx) => {
                 const properties = filterdProps[idx]
                 const linkedSheet = await (await obj.getParent()).getProperties();
+
+                let affectedDims, affectedMeasures
+
+                if (properties.visualization === 'boxplot') {
+                    affectedDims = properties.boxplotDef.qHyperCubeDef?.qDimensions.filter(helperFunctions.findAffectedDims)
+                    affectedMeasures = properties.boxplotDef.qHyperCubeDef?.qMeasures.filter(helperFunctions.findAffectedMeasures)
+                } else {
+                    affectedDims = properties.qHyperCubeDef?.qDimensions.filter(helperFunctions.findAffectedDims)
+                    affectedMeasures = properties.qHyperCubeDef?.qMeasures.filter(helperFunctions.findAffectedMeasures)
+                }
+
                 return {
                     properties,
-                    affectedDims: properties.qHyperCubeDef.qDimensions.filter(helperFunctions.findAffectedDims),
-                    affectedMeasures: properties.qHyperCubeDef.qMeasures.filter(helperFunctions.findAffectedMeasures),
+                    affectedDims,
+                    affectedMeasures,
                     linkedSheet
                 }
             }))
@@ -214,8 +225,6 @@ class EnigmaService {
             return (await filterPane.getParent()).getProperties()
         }))
         
-        console.log('props', filteredProps)
-        console.log('sheets', sheets)
         const filterPaneInfo = filteredObjects.map((obj, idx) => {
             // const filterPane = affectedFilterPanes[idx]
             const props = filteredProps[idx]
@@ -252,26 +261,11 @@ class EnigmaService {
             {
               "qTop": 0,
               "qHeight": 100,
-            //   "qHeight": 10000,
               "qLeft": 0,
               "qWidth": 1
             }
         ]
 
-        // const allListDefs = {}
-        
-        // fieldNameList.forEach((fieldName, index) => {
-        //     allListDefs[index] = {
-        //         qListObjectDef: {
-        //             qStateName: '$',
-        //             qDef: {
-        //                 qFieldDefs: [fieldName]
-        //             },
-        //             qInitialDataFetch: qDataPage
-
-        //         }
-        //     }
-        // })
 
         const allListDefs = fieldNameList.map((fieldName) => {
             return {
@@ -294,26 +288,7 @@ class EnigmaService {
             allListDefs
         })
 
-        // const allPossibleValues = await Promise.all(fieldNameList.map( async (fieldName, index) => {
-        //     console.log('current', {
-        //         qPath: `/allListDefs/qListObjectDef_${index}`,
-        //         qPages: qDataPage
-        //     })
-        //     return await sessionObject.getListObjectData({
-        //         qPath: `/allListDefs/qListObjectDef_${index}`,
-        //         qPages: qDataPage
-        //     })
-        // }))
-
-        // console.log(allPossibleValues)
-        
-        // const allPossibleValues = await sessionObject.getListObjectData({
-        //     qPath: '/allListDefs/0/qListObjectDef',
-        //     qPages: qDataPage
-        // })
-
         const allPossibleValues = await sessionObject.getLayout()
-        console.log('all possible values', allPossibleValues)
 
         const fieldsOfInterest = allPossibleValues.allListDefs.filter((fieldList) => {
             const fieldName = fieldList.qListObject.qDimensionInfo.qFallbackTitle
@@ -326,14 +301,12 @@ class EnigmaService {
             return valuesToSearch.some(value => allValues.includes(value))
         })
 
-        console.log(fieldsOfInterest.map(field => [field.qListObject.qDimensionInfo.qFallbackTitle, field.qListObject.qDataPages]))
         return fieldsOfInterest.map(field => field.qListObject.qDimensionInfo.qFallbackTitle)
     }
 
     async getAllProperties() {
         try {
             const objectsInfo = await this.app.getObjects({qTypes: qChartTypes})
-            console.log(objectsInfo)
 
             const objects = await Promise.all(objectsInfo.map(obj => this.app.getObject(obj.qInfo.qId)))
 
@@ -350,7 +323,6 @@ class EnigmaService {
     async getAllLayouts() {
         try {
             const objectsInfo = await this.app.getObjects({qTypes: qChartTypes})
-            console.log(objectsInfo)
 
             const objects = await Promise.all(objectsInfo.map(obj => this.app.getObject(obj.qInfo.qId)))
 
