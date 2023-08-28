@@ -113,7 +113,7 @@ const Interface = () => {
                     "Dimensão Impactada": removeCRLF(currDimDef),
                     "Medida Impactada": removeCRLF(currMeasureDef),
                     "Pasta (ID)": item.linkedSheetProps.qInfo.qId,
-                    "Pasta (Nome)":item.linkedSheetLayout.qMetaDef.title,
+                    "Pasta (Nome)":item.linkedSheetProps.qMetaDef.title,
                     "Pasta Publicada?":item.linkedSheetLayout.qMeta?.published
                 })
                 
