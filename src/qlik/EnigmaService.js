@@ -89,7 +89,6 @@ class EnigmaService {
         
             // const chartsOfInterest = chartProps.filter(helperFunctions.filterCharts)
             const filterMask = chartProps.map(helperFunctions.filterCharts)
-            
             const filteredObjs = objects.filter((obj, idx) => filterMask[idx])
             const filterdProps = chartProps.filter((obj, idx) => filterMask[idx])
 

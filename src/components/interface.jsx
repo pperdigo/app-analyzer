@@ -94,7 +94,6 @@ const Interface = () => {
 
     const downloadCharts = (charts) => {
         const chartsCSV = charts.map(item => {
-            console.log(item)
             const affectedDims = item.affectedDims?.length || 0
             const affectedMeasures = item.affectedMeasures?.length || 0
             const maxExpressions = Math.max(affectedDims, affectedMeasures)
@@ -114,7 +113,7 @@ const Interface = () => {
                     "Dimensão Impactada": removeCRLF(currDimDef),
                     "Medida Impactada": removeCRLF(currMeasureDef),
                     "Pasta (ID)": item.linkedSheetProps.qInfo.qId,
-                    "Pasta (Nome)":item.linkedSheetProps.qMetaDef.title,
+                    "Pasta (Nome)":item.linkedSheetLayout.qMetaDef.title,
                     "Pasta Publicada?":item.linkedSheetLayout.qMeta?.published
                 })
                 
