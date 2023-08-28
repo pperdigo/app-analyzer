@@ -1,7 +1,7 @@
 import valuesToSearch from '../assets/valuesToSearch.json'
 
 function checkString(string, valueToSearch) {
-    return  (string.toLowerCase().includes('if') || string.includes('{<')) && string.includes(valueToSearch)
+    return  (string.toLowerCase().includes('if') || (string.includes('<') && string.includes('>'))) && string.includes(valueToSearch)
 }
 
 const helperFunctions = {
