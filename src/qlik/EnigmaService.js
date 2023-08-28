@@ -95,8 +95,8 @@ class EnigmaService {
             const chartInfo = await Promise.all(filteredObjs.map( async (obj, idx) => {
                 const properties = filterdProps[idx]
                 const linkedSheet = await obj.getParent();
-                const linkedSheetProps = await linkedSheet.getLayout();
-                const linkedSheetLayout = await linkedSheet.getProperties();
+                const linkedSheetLayout = await linkedSheet.getLayout();
+                const linkedSheetProps = await linkedSheet.getProperties();
 
                 let affectedDims, affectedMeasures
 

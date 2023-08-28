@@ -124,7 +124,11 @@ const Interface = () => {
         jsonToCsvExport({
             data: chartsCSV.flat(),
             filename: `${selApp.appName}_charts.csv`,
-            headers: ['Id da Visualização', 'Nome da Visualização', "Tipo de Visualização da Visualização", "Dimensão Impactada da Visualização", "Medida Impactada da Visualização", "Pasta (ID) da Visualização", "Pasta (Nome) da Visualização"],
+            headers: [
+                'Id da Visualização', 'Nome da Visualização', "Tipo de Visualização", 
+                "Dimensão Impactada da Visualização", "Medida Impactada da Visualização", 
+                "Pasta (ID) da Visualização", "Pasta (Nome) da Visualização", "Pasta Publicada?"
+            ],
             delimiter: '|'
         })
     }
