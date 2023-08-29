@@ -226,8 +226,8 @@ class EnigmaService {
             if (filterPane.genericType === 'masterobject') return ''
             const parentSheet = await filterPane.getParent()
             return {
-                sheetProps: parentSheet.getProperties(),
-                sheetLayout: parentSheet.getLayout()
+                sheetProps: await parentSheet.getProperties(),
+                sheetLayout: await parentSheet.getLayout()
             }
         }))
         
